@@ -1,4 +1,4 @@
-package com.github.tomokinakamaru.fsm;
+package com.github.tomokinakamaru.nfa;
 
 import java.util.HashMap;
 import java.util.HashSet;

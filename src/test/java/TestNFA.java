@@ -1,23 +1,23 @@
-import static com.github.tomokinakamaru.fsm.FSM.atom;
-import static com.github.tomokinakamaru.fsm.FSM.concat;
-import static com.github.tomokinakamaru.fsm.FSM.union;
+import static com.github.tomokinakamaru.nfa.NFA.atom;
+import static com.github.tomokinakamaru.nfa.NFA.concat;
+import static com.github.tomokinakamaru.nfa.NFA.union;
 import static java.util.Arrays.asList;
 
-import com.github.tomokinakamaru.fsm.FSM;
+import com.github.tomokinakamaru.nfa.NFA;
 import org.junit.jupiter.api.Test;
 
-final class TestFSM {
+final class TestNFA {
 
   @Test
   void testAtom() {
-    FSM<Integer> m = atom(1);
+    NFA<Integer> m = atom(1);
     m.consume(1);
     assert m.isAccepting();
   }
 
   @Test
   void testUnion() {
-    FSM<Integer> m = union(asList(atom(1), atom(2)));
+    NFA<Integer> m = union(asList(atom(1), atom(2)));
 
     assert !m.isAccepting();
 
@@ -31,7 +31,7 @@ final class TestFSM {
 
   @Test
   void testConcat() {
-    FSM<Integer> m = concat(asList(atom(1), atom(2)));
+    NFA<Integer> m = concat(asList(atom(1), atom(2)));
 
     assert !m.isAccepting();
 
@@ -44,7 +44,7 @@ final class TestFSM {
 
   @Test
   void testRepeat() {
-    FSM<Integer> m = atom(1).repeated();
+    NFA<Integer> m = atom(1).repeated();
 
     assert m.isAccepting();
 
@@ -57,7 +57,7 @@ final class TestFSM {
 
   @Test
   void testReverse() {
-    FSM<Integer> m = concat(asList(atom(1), atom(2))).reversed();
+    NFA<Integer> m = concat(asList(atom(1), atom(2))).reversed();
 
     assert !m.isAccepting();
 
@@ -70,7 +70,7 @@ final class TestFSM {
 
   @Test
   void testDeterminized() {
-    FSM<Integer> m = union(asList(atom(1), atom(2))).determinized();
+    NFA<Integer> m = union(asList(atom(1), atom(2))).determinized();
 
     assert !m.isAccepting();
 
@@ -84,9 +84,9 @@ final class TestFSM {
 
   @Test
   void testMinimumDeterminized() {
-    FSM<Integer> m1 = union(asList(atom(1), atom(2)));
-    FSM<Integer> m2 = union(asList(atom(3), atom(4)));
-    FSM<Integer> m = concat(asList(m1, m2)).minimumDeterminized();
+    NFA<Integer> m1 = union(asList(atom(1), atom(2)));
+    NFA<Integer> m2 = union(asList(atom(3), atom(4)));
+    NFA<Integer> m = concat(asList(m1, m2)).minimumDeterminized();
 
     assert !m.isAccepting();
 

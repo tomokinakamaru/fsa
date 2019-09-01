@@ -1,11 +1,11 @@
-package com.github.tomokinakamaru.fsm;
+package com.github.tomokinakamaru.nfa;
 
-import static com.github.tomokinakamaru.fsm.Utility.difference;
-import static com.github.tomokinakamaru.fsm.Utility.overlap;
-import static com.github.tomokinakamaru.fsm.Utility.pop;
-import static com.github.tomokinakamaru.fsm.Utility.product;
-import static com.github.tomokinakamaru.fsm.Utility.singletonMap;
-import static com.github.tomokinakamaru.fsm.Utility.singletonSet;
+import static com.github.tomokinakamaru.nfa.Utility.difference;
+import static com.github.tomokinakamaru.nfa.Utility.overlap;
+import static com.github.tomokinakamaru.nfa.Utility.pop;
+import static com.github.tomokinakamaru.nfa.Utility.product;
+import static com.github.tomokinakamaru.nfa.Utility.singletonMap;
+import static com.github.tomokinakamaru.nfa.Utility.singletonSet;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class FSM<T> {
+public final class NFA<T> {
 
   private static long nextState = 0;
 
@@ -27,21 +27,21 @@ public final class FSM<T> {
 
   private Set<Long> head = null;
 
-  private FSM() {}
+  private NFA() {}
 
-  public static <T> FSM<T> atom(T label) {
+  public static <T> NFA<T> atom(T label) {
     long source = newState();
     long destination = newState();
-    FSM<T> nfa = new FSM<>();
+    NFA<T> nfa = new NFA<>();
     nfa.initials.add(source);
     nfa.transitions.add(new Transition<>(source, label, destination));
     nfa.finals.add(destination);
     return nfa;
   }
 
-  public static <T> FSM<T> union(Collection<FSM<T>> collection) {
-    FSM<T> nfa = new FSM<>();
-    for (FSM<T> m : collection) {
+  public static <T> NFA<T> union(Collection<NFA<T>> collection) {
+    NFA<T> nfa = new NFA<>();
+    for (NFA<T> m : collection) {
       nfa.initials.addAll(m.initials);
       nfa.transitions.addAll(m.transitions);
       nfa.finals.addAll(m.finals);
@@ -49,8 +49,8 @@ public final class FSM<T> {
     return nfa;
   }
 
-  public static <T> FSM<T> concat(List<FSM<T>> collection) {
-    FSM<T> nfa = new FSM<>();
+  public static <T> NFA<T> concat(List<NFA<T>> collection) {
+    NFA<T> nfa = new NFA<>();
     nfa.initials.addAll(collection.get(0).initials);
     nfa.finals.addAll(collection.get(collection.size() - 1).finals);
     collection.forEach(m -> nfa.transitions.addAll(m.transitions));
@@ -91,12 +91,12 @@ public final class FSM<T> {
     return overlap(head, finals);
   }
 
-  public FSM<T> minimumDeterminized() {
+  public NFA<T> minimumDeterminized() {
     return reversed().determinized().reversed().determinized();
   }
 
-  public FSM<T> repeated() {
-    FSM<T> nfa = new FSM<>();
+  public NFA<T> repeated() {
+    NFA<T> nfa = new NFA<>();
     nfa.initials.addAll(initials);
     nfa.transitions.addAll(transitions);
     nfa.finals.addAll(finals);
@@ -105,15 +105,15 @@ public final class FSM<T> {
     return nfa;
   }
 
-  public FSM<T> reversed() {
-    FSM<T> nfa = new FSM<>();
+  public NFA<T> reversed() {
+    NFA<T> nfa = new NFA<>();
     nfa.initials.addAll(finals);
     nfa.finals.addAll(initials);
     transitions.stream().map(Transition::reversed).forEach(nfa.transitions::add);
     return nfa;
   }
 
-  public FSM<T> determinized() {
+  public NFA<T> determinized() {
     Set<Long> initial = findEpsilonClosure(initials);
 
     Set<Set<Long>> waits = singletonSet(initial);
@@ -137,7 +137,7 @@ public final class FSM<T> {
       }
     }
 
-    FSM<T> nfa = new FSM<>();
+    NFA<T> nfa = new NFA<>();
     nfa.initials.add(stateMap.get(initial));
     nfa.transitions.addAll(transitions);
     for (Set<Long> states : stateMap.keySet()) {
