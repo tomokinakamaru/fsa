@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class FiniteStateAutomaton<T> {
+public final class FiniteStateAutomaton<T> {
 
   public final Set<State> initials = new LinkedHashSet<>();
 
