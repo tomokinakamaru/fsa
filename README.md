@@ -1,1 +1,1 @@
-# Non-deterministic Finite-state Automaton
+# Finite-state Automaton
