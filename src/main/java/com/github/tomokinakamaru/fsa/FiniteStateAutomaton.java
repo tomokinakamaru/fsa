@@ -38,7 +38,7 @@ public class FiniteStateAutomaton<T> {
 
   public Set<State> getStates() {
     Set<State> states = new LinkedHashSet<>(initials);
-    for (Transition transition : transitions) {
+    for (Transition<T> transition : transitions) {
       states.add(transition.source);
       states.add(transition.destination);
     }
@@ -53,22 +53,22 @@ public class FiniteStateAutomaton<T> {
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
-  public Set<Transition> getTransitionsFrom(State source) {
+  public Set<Transition<T>> getTransitionsFrom(State source) {
     return getTransitionsFrom(singleton(source));
   }
 
-  public Set<Transition> getTransitionsFrom(Set<State> sources) {
+  public Set<Transition<T>> getTransitionsFrom(Set<State> sources) {
     return transitions
         .stream()
         .filter(t -> sources.contains(t.source))
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
-  public Set<Transition> getTransitionsTo(State destination) {
+  public Set<Transition<T>> getTransitionsTo(State destination) {
     return getTransitionsTo(singleton(destination));
   }
 
-  public Set<Transition> getTransitionsTo(Set<State> destinations) {
+  public Set<Transition<T>> getTransitionsTo(Set<State> destinations) {
     return transitions
         .stream()
         .filter(t -> destinations.contains(t.destination))
@@ -118,7 +118,7 @@ public class FiniteStateAutomaton<T> {
       if (overlap(closure, core)) {
         reverseClosure.addAll(closure);
       }
-      for (Transition transition : getTransitionsFrom(source)) {
+      for (Transition<T> transition : getTransitionsFrom(source)) {
         if (!queuedState.contains(transition.destination)) {
           queue.add(transition.destination);
           queuedState.add(transition.destination);
@@ -154,7 +154,7 @@ public class FiniteStateAutomaton<T> {
     while (!queue.isEmpty()) {
       State source = queue.remove(0);
       traverser.traverse(source, this);
-      for (Transition transition : transitions) {
+      for (Transition<T> transition : transitions) {
         if (!queuedStates.contains(transition.destination)) {
           queue.add(transition.destination);
           queuedStates.add(transition.destination);

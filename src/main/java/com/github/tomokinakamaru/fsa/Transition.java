@@ -30,7 +30,7 @@ public final class Transition<T> {
     if (!(obj instanceof Transition)) {
       return false;
     }
-    Transition transition = (Transition) obj;
+    Transition<?> transition = (Transition<?>) obj;
     return Objects.equals(source, transition.source)
         && Objects.equals(symbol, transition.symbol)
         && Objects.equals(destination, transition.destination);
