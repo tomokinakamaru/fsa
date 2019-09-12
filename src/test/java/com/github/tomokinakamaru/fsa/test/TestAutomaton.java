@@ -1,36 +1,8 @@
 package com.github.tomokinakamaru.fsa.test;
 
-import com.github.tomokinakamaru.fsa.Automaton;
-import com.github.tomokinakamaru.fsa.State;
-import com.github.tomokinakamaru.fsa.Transition;
 import org.junit.jupiter.api.Test;
 
-final class Main {
-
-  private static final class IntTransition extends Transition<Integer> {
-    IntTransition(State source, Integer symbol, State destination) {
-      super(source, symbol, destination);
-    }
-  }
-
-  private static final class IntAutomaton extends Automaton<Integer, IntTransition, IntAutomaton> {
-
-    IntAutomaton() {}
-
-    IntAutomaton(int n) {
-      super(n);
-    }
-
-    @Override
-    protected IntAutomaton newAutomaton() {
-      return new IntAutomaton();
-    }
-
-    @Override
-    protected IntTransition newTransition(State source, Integer symbol, State destination) {
-      return new IntTransition(source, symbol, destination);
-    }
-  }
+final class TestAutomaton {
 
   @Test
   void testAtom() {
@@ -88,7 +60,7 @@ final class Main {
   }
 
   @Test
-  void testDeterminize() {
+  void testDeterminize1() {
     IntAutomaton a1 = new IntAutomaton(1);
     IntAutomaton a2 = new IntAutomaton(2);
     IntAutomaton a3 = new IntAutomaton(3);
@@ -106,5 +78,30 @@ final class Main {
 
     assert a.transitions.stream().noneMatch(t -> t.symbol == null);
     assert a.getStates().size() == 4;
+  }
+
+  @Test
+  void testDeterminized2() {
+    IntAutomaton a = new IntAutomaton().determinized();
+    assert a.getStates().isEmpty();
+
+    a.consume(1);
+    assert !a.isAccepting();
+  }
+
+  @Test
+  void testGetTransitions() {
+    IntAutomaton a = new IntAutomaton(1);
+    assert a.getTransitionsFrom(a.initials.iterator().next()).size() == 1;
+    assert a.getTransitionsTo(a.finals.iterator().next()).size() == 1;
+  }
+
+  @Test
+  void testGetReverseEpsilonClosure() {
+    IntAutomaton a1 = new IntAutomaton(1).and(new IntAutomaton(null));
+    assert a1.getReverseEpsilonClosure(a1.finals).size() == 3;
+
+    IntAutomaton a2 = new IntAutomaton(1).and(new IntAutomaton(null)).repeated();
+    assert a2.getReverseEpsilonClosure(a2.finals).size() == 4;
   }
 }
