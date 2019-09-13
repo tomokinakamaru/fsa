@@ -1,9 +1,9 @@
 package com.github.tomokinakamaru.fsa.test;
 
-import com.github.tomokinakamaru.fsa.Automaton;
+import com.github.tomokinakamaru.fsa.AbstractAutomaton;
 import com.github.tomokinakamaru.fsa.State;
 
-final class IntAutomaton extends Automaton<Integer, IntTransition, IntAutomaton> {
+final class IntAutomaton extends AbstractAutomaton<Integer, IntTransition, IntAutomaton> {
 
   IntAutomaton() {}
 

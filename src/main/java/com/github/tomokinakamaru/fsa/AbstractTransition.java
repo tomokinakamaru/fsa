@@ -2,7 +2,7 @@ package com.github.tomokinakamaru.fsa;
 
 import java.util.Objects;
 
-public abstract class Transition<S> {
+public abstract class AbstractTransition<S> {
 
   public final State source;
 
@@ -10,7 +10,7 @@ public abstract class Transition<S> {
 
   public final State destination;
 
-  protected Transition(State source, S symbol, State destination) {
+  protected AbstractTransition(State source, S symbol, State destination) {
     this.source = source;
     this.symbol = symbol;
     this.destination = destination;
@@ -23,10 +23,10 @@ public abstract class Transition<S> {
 
   @Override
   public final boolean equals(Object obj) {
-    if (!(obj instanceof Transition)) {
+    if (!(obj instanceof AbstractTransition)) {
       return false;
     }
-    Transition<?> transition = (Transition<?>) obj;
+    AbstractTransition<?> transition = (AbstractTransition<?>) obj;
     return Objects.equals(source, transition.source)
         && Objects.equals(symbol, transition.symbol)
         && Objects.equals(destination, transition.destination);

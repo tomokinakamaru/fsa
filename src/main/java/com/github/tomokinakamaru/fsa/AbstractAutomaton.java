@@ -13,7 +13,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class Automaton<S, T extends Transition<S>, A extends Automaton<S, T, A>> {
+public abstract class AbstractAutomaton<
+    S, T extends AbstractTransition<S>, A extends AbstractAutomaton<S, T, A>> {
 
   protected abstract T newTransition(State source, S symbol, State destination);
 
@@ -27,9 +28,9 @@ public abstract class Automaton<S, T extends Transition<S>, A extends Automaton<
 
   public Set<State> head = null;
 
-  protected Automaton() {}
+  protected AbstractAutomaton() {}
 
-  protected Automaton(S symbol) {
+  protected AbstractAutomaton(S symbol) {
     State s = new State();
     State d = new State();
     initials.add(s);
