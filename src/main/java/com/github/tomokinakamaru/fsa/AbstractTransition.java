@@ -2,15 +2,15 @@ package com.github.tomokinakamaru.fsa;
 
 import java.util.Objects;
 
-public abstract class AbstractTransition<S> {
+public abstract class AbstractTransition<Q, S> {
 
-  public final State source;
+  public final Q source;
 
   public final S symbol;
 
-  public final State destination;
+  public final Q destination;
 
-  protected AbstractTransition(State source, S symbol, State destination) {
+  protected AbstractTransition(Q source, S symbol, Q destination) {
     this.source = source;
     this.symbol = symbol;
     this.destination = destination;
@@ -26,7 +26,7 @@ public abstract class AbstractTransition<S> {
     if (!(obj instanceof AbstractTransition)) {
       return false;
     }
-    AbstractTransition<?> transition = (AbstractTransition<?>) obj;
+    AbstractTransition<?, ?> transition = (AbstractTransition<?, ?>) obj;
     return Objects.equals(source, transition.source)
         && Objects.equals(symbol, transition.symbol)
         && Objects.equals(destination, transition.destination);

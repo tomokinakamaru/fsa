@@ -1,6 +1,5 @@
 package com.github.tomokinakamaru.fsa.test;
 
-import com.github.tomokinakamaru.fsa.State;
 import org.junit.jupiter.api.Test;
 
 final class TestTransition {

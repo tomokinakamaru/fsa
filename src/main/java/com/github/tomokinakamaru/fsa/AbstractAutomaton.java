@@ -14,25 +14,34 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class AbstractAutomaton<
-    S, T extends AbstractTransition<S>, A extends AbstractAutomaton<S, T, A>> {
+    Q extends StateInterface,
+    S,
+    T extends AbstractTransition<Q, S>,
+    A extends AbstractAutomaton<Q, S, T, A>> {
 
-  protected abstract T newTransition(State source, S symbol, State destination);
+  protected abstract Q newState();
+
+  protected abstract Q newState(Set<Q> states);
+
+  protected abstract Q newState(Q state);
+
+  protected abstract T newTransition(Q source, S symbol, Q destination);
 
   protected abstract A newAutomaton();
 
-  public final Set<State> initials = new LinkedHashSet<>();
+  public final Set<Q> initials = new LinkedHashSet<>();
 
   public final Set<T> transitions = new LinkedHashSet<>();
 
-  public final Set<State> finals = new LinkedHashSet<>();
+  public final Set<Q> finals = new LinkedHashSet<>();
 
-  public Set<State> head = null;
+  public Set<Q> head = null;
 
   protected AbstractAutomaton() {}
 
   protected AbstractAutomaton(S symbol) {
-    State s = new State();
-    State d = new State();
+    Q s = newState();
+    Q d = newState();
     initials.add(s);
     finals.add(d);
     transitions.add(newTransition(s, symbol, d));
@@ -56,8 +65,8 @@ public abstract class AbstractAutomaton<
     return overlap(getEpsilonClosure(head), finals);
   }
 
-  public final Set<State> getStates() {
-    Set<State> states = new LinkedHashSet<>(initials);
+  public final Set<Q> getStates() {
+    Set<Q> states = new LinkedHashSet<>(initials);
     for (T transition : transitions) {
       states.add(transition.source);
       states.add(transition.destination);
@@ -65,48 +74,48 @@ public abstract class AbstractAutomaton<
     return states;
   }
 
-  public final Set<T> getTransitionsFrom(State source) {
+  public final Set<T> getTransitionsFrom(Q source) {
     return getTransitionsFrom(singleton(source));
   }
 
-  public final Set<T> getTransitionsFrom(Set<State> sources) {
+  public final Set<T> getTransitionsFrom(Set<Q> sources) {
     return transitions
         .stream()
         .filter(t -> sources.contains(t.source))
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
-  public final Set<T> getTransitionsTo(State destination) {
+  public final Set<T> getTransitionsTo(Q destination) {
     return getTransitionsTo(singleton(destination));
   }
 
-  public final Set<T> getTransitionsTo(Set<State> destinations) {
+  public final Set<T> getTransitionsTo(Set<Q> destinations) {
     return transitions
         .stream()
         .filter(t -> destinations.contains(t.destination))
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
-  public final Set<State> getEpsilonClosure(Set<State> core) {
-    Set<State> closure = new LinkedHashSet<>(core);
-    Set<State> waits = new LinkedHashSet<>(core);
+  public final Set<Q> getEpsilonClosure(Set<Q> core) {
+    Set<Q> closure = new LinkedHashSet<>(core);
+    Set<Q> waits = new LinkedHashSet<>(core);
     while (!waits.isEmpty()) {
-      Set<State> destinations = getDestinations(singleton(pop(waits)), null);
+      Set<Q> destinations = getDestinations(singleton(pop(waits)), null);
       waits.addAll(difference(destinations, closure));
       closure.addAll(destinations);
     }
     return closure;
   }
 
-  public final Set<State> getReverseEpsilonClosure(Set<State> core) {
-    Set<State> reverseClosure = new LinkedHashSet<>();
+  public final Set<Q> getReverseEpsilonClosure(Set<Q> core) {
+    Set<Q> reverseClosure = new LinkedHashSet<>();
 
-    Set<State> queue = new LinkedHashSet<>(initials);
-    Set<State> queuedState = new LinkedHashSet<>(initials);
+    Set<Q> queue = new LinkedHashSet<>(initials);
+    Set<Q> queuedState = new LinkedHashSet<>(initials);
 
     while (!queue.isEmpty()) {
-      State source = pop(queue);
-      Set<State> closure = getEpsilonClosure(singleton(source));
+      Q source = pop(queue);
+      Set<Q> closure = getEpsilonClosure(singleton(source));
       if (overlap(closure, core)) {
         reverseClosure.addAll(closure);
       }
@@ -164,13 +173,13 @@ public abstract class AbstractAutomaton<
 
   public final A determinized() {
     A automaton = newAutomaton();
-    Set<Set<State>> waits = new LinkedHashSet<>();
-    Map<Set<State>, State> stateMap = new LinkedHashMap<>();
+    Set<Set<Q>> waits = new LinkedHashSet<>();
+    Map<Set<Q>, Q> stateMap = new LinkedHashMap<>();
 
-    Set<State> initial = getEpsilonClosure(initials);
+    Set<Q> initial = getEpsilonClosure(initials);
     if (!initial.isEmpty()) {
       waits.add(initial);
-      stateMap.put(initial, new State());
+      stateMap.put(initial, newState(initial));
       automaton.initials.add(stateMap.get(initial));
     }
 
@@ -182,28 +191,28 @@ public abstract class AbstractAutomaton<
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
     while (!waits.isEmpty()) {
-      Set<State> src = waits.iterator().next();
+      Set<Q> src = waits.iterator().next();
       waits.remove(src);
 
       for (S symbol : symbols) {
-        Set<State> dst = getEpsilonClosure(getDestinations(src, symbol));
+        Set<Q> dst = getEpsilonClosure(getDestinations(src, symbol));
 
         if (dst.isEmpty()) {
           continue;
         }
 
         if (!stateMap.containsKey(dst)) {
-          stateMap.put(dst, new State());
+          stateMap.put(dst, newState(dst));
           waits.add(dst);
         }
 
-        State s = stateMap.get(src);
-        State d = stateMap.get(dst);
+        Q s = stateMap.get(src);
+        Q d = stateMap.get(dst);
         automaton.transitions.add(newTransition(s, symbol, d));
       }
     }
 
-    for (Set<State> states : stateMap.keySet()) {
+    for (Set<Q> states : stateMap.keySet()) {
       if (finals.stream().anyMatch(states::contains)) {
         automaton.finals.add(stateMap.get(states));
       }
@@ -213,39 +222,39 @@ public abstract class AbstractAutomaton<
   }
 
   public final A copy() {
-    Map<State, State> map = new HashMap<>();
-    for (State state : getStates()) {
-      map.put(state, new State());
+    Map<Q, Q> map = new HashMap<>();
+    for (Q state : getStates()) {
+      map.put(state, newState(state));
     }
 
     A automaton = newAutomaton();
 
-    for (State state : initials) {
+    for (Q state : initials) {
       automaton.initials.add(map.get(state));
     }
 
     for (T transition : transitions) {
-      State source = map.get(transition.source);
-      State destination = map.get(transition.destination);
+      Q source = map.get(transition.source);
+      Q destination = map.get(transition.destination);
       automaton.transitions.add(newTransition(source, transition.symbol, destination));
     }
 
-    for (State state : finals) {
+    for (Q state : finals) {
       automaton.finals.add(map.get(state));
     }
 
     return automaton;
   }
 
-  final void fuse(Set<State> src, Set<State> dst) {
-    for (State s : src) {
-      for (State d : dst) {
+  final void fuse(Set<Q> src, Set<Q> dst) {
+    for (Q s : src) {
+      for (Q d : dst) {
         transitions.add(newTransition(s, null, d));
       }
     }
   }
 
-  private Set<State> getDestinations(Set<State> sources, S symbol) {
+  private Set<Q> getDestinations(Set<Q> sources, S symbol) {
     return getTransitionsFrom(sources)
         .stream()
         .filter(t -> Objects.equals(symbol, t.symbol))
