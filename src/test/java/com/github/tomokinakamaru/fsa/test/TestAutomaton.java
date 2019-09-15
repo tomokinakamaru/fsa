@@ -99,9 +99,9 @@ final class TestAutomaton {
   @Test
   void testGetReverseEpsilonClosure() {
     IntAutomaton a1 = new IntAutomaton(1).and(new IntAutomaton(null));
-    assert a1.getReverseEpsilonClosure(a1.finals).size() == 3;
+    assert a1.getEpsilonClosureTo(a1.finals).size() == 3;
 
     IntAutomaton a2 = new IntAutomaton(1).and(new IntAutomaton(null)).repeated();
-    assert a2.getReverseEpsilonClosure(a2.finals).size() == 4;
+    assert a2.getEpsilonClosureTo(a2.finals.iterator().next()).size() == 4;
   }
 }

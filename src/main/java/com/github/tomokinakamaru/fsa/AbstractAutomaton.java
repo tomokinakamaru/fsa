@@ -48,21 +48,21 @@ public abstract class AbstractAutomaton<
   }
 
   public void reset() {
-    head = getEpsilonClosure(initials);
+    head = getEpsilonClosureFrom(initials);
   }
 
   public void consume(S symbol) {
     if (head == null) {
       reset();
     }
-    head = getEpsilonClosure(getDestinations(getEpsilonClosure(head), symbol));
+    head = getEpsilonClosureFrom(getDestinations(getEpsilonClosureFrom(head), symbol));
   }
 
   public boolean isAccepting() {
     if (head == null) {
       reset();
     }
-    return overlap(getEpsilonClosure(head), finals);
+    return overlap(getEpsilonClosureFrom(head), finals);
   }
 
   public final Set<Q> getStates() {
@@ -96,7 +96,11 @@ public abstract class AbstractAutomaton<
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
-  public final Set<Q> getEpsilonClosure(Set<Q> core) {
+  public final Set<Q> getEpsilonClosureFrom(Q core) {
+    return getEpsilonClosureFrom(singleton(core));
+  }
+
+  public final Set<Q> getEpsilonClosureFrom(Set<Q> core) {
     Set<Q> closure = new LinkedHashSet<>(core);
     Set<Q> waits = new LinkedHashSet<>(core);
     while (!waits.isEmpty()) {
@@ -107,7 +111,11 @@ public abstract class AbstractAutomaton<
     return closure;
   }
 
-  public final Set<Q> getReverseEpsilonClosure(Set<Q> core) {
+  public final Set<Q> getEpsilonClosureTo(Q core) {
+    return getEpsilonClosureTo(singleton(core));
+  }
+
+  public final Set<Q> getEpsilonClosureTo(Set<Q> core) {
     Set<Q> reverseClosure = new LinkedHashSet<>();
 
     Set<Q> queue = new LinkedHashSet<>(initials);
@@ -115,7 +123,7 @@ public abstract class AbstractAutomaton<
 
     while (!queue.isEmpty()) {
       Q source = pop(queue);
-      Set<Q> closure = getEpsilonClosure(singleton(source));
+      Set<Q> closure = getEpsilonClosureFrom(source);
       if (overlap(closure, core)) {
         reverseClosure.addAll(closure);
       }
@@ -176,7 +184,7 @@ public abstract class AbstractAutomaton<
     Set<Set<Q>> waits = new LinkedHashSet<>();
     Map<Set<Q>, Q> stateMap = new LinkedHashMap<>();
 
-    Set<Q> initial = getEpsilonClosure(initials);
+    Set<Q> initial = getEpsilonClosureFrom(initials);
     if (!initial.isEmpty()) {
       waits.add(initial);
       stateMap.put(initial, newState(initial));
@@ -195,7 +203,7 @@ public abstract class AbstractAutomaton<
       waits.remove(src);
 
       for (S symbol : symbols) {
-        Set<Q> dst = getEpsilonClosure(getDestinations(src, symbol));
+        Set<Q> dst = getEpsilonClosureFrom(getDestinations(src, symbol));
 
         if (dst.isEmpty()) {
           continue;
