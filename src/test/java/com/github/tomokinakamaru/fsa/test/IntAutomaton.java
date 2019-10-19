@@ -25,14 +25,4 @@ final class IntAutomaton extends AbstractAutomaton<State, Integer, IntTransition
   protected State newState() {
     return new State();
   }
-
-  @Override
-  protected State newState(Set<State> states) {
-    return new State();
-  }
-
-  @Override
-  protected State newState(State state) {
-    return new State();
-  }
 }
