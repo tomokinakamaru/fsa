@@ -162,6 +162,10 @@ public abstract class AbstractAutomaton<
     return automaton;
   }
 
+  public A minDeterminized() {
+    return reversed().determinized().reversed().determinized();
+  }
+
   public final A reversed() {
     A automaton = newAutomaton();
     A copied = copy();
