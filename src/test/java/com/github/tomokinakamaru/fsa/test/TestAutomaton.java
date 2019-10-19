@@ -64,7 +64,7 @@ final class TestAutomaton {
     IntAutomaton a1 = new IntAutomaton(1);
     IntAutomaton a2 = new IntAutomaton(2);
     IntAutomaton a3 = new IntAutomaton(3);
-    IntAutomaton a = a1.and(a2.or(a3)).and(a1).reversed().determinized().reversed().determinized();
+    IntAutomaton a = a1.and(a2.or(a3)).and(a1).minDeterminized();
     assert !a.isAccepting();
 
     a.consume(1);

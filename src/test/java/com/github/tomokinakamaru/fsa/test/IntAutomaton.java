@@ -1,7 +1,6 @@
 package com.github.tomokinakamaru.fsa.test;
 
 import com.github.tomokinakamaru.fsa.AbstractAutomaton;
-import java.util.Set;
 
 final class IntAutomaton extends AbstractAutomaton<State, Integer, IntTransition, IntAutomaton> {
 
