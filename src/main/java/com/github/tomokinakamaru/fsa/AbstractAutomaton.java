@@ -21,10 +21,6 @@ public abstract class AbstractAutomaton<
 
   protected abstract Q newState();
 
-  protected abstract Q newState(Set<Q> states);
-
-  protected abstract Q newState(Q state);
-
   protected abstract T newTransition(Q source, S symbol, Q destination);
 
   protected abstract A newAutomaton();
@@ -252,6 +248,14 @@ public abstract class AbstractAutomaton<
     }
 
     return automaton;
+  }
+
+  protected Q newState(Set<Q> states) {
+    return newState();
+  }
+
+  protected Q newState(Q state) {
+    return newState();
   }
 
   final void fuse(Set<Q> src, Set<Q> dst) {
