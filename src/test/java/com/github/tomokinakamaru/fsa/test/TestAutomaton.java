@@ -1,12 +1,13 @@
 package com.github.tomokinakamaru.fsa.test;
 
+import com.github.tomokinakamaru.fsa.test.automaton.Automaton;
 import org.junit.jupiter.api.Test;
 
 final class TestAutomaton {
 
   @Test
   void testAtom() {
-    IntAutomaton a = new IntAutomaton(1);
+    Automaton a = new Automaton(1);
     assert !a.isAccepting();
 
     a.consume(1);
@@ -15,9 +16,9 @@ final class TestAutomaton {
 
   @Test
   void testAnd() {
-    IntAutomaton a1 = new IntAutomaton(1);
-    IntAutomaton a2 = new IntAutomaton(2);
-    IntAutomaton a = a1.and(a2).and(a1);
+    Automaton a1 = new Automaton(1);
+    Automaton a2 = new Automaton(2);
+    Automaton a = a1.and(a2).and(a1);
     assert !a.isAccepting();
 
     a.consume(1);
@@ -32,9 +33,9 @@ final class TestAutomaton {
 
   @Test
   void testOr() {
-    IntAutomaton a1 = new IntAutomaton(1);
-    IntAutomaton a2 = new IntAutomaton(2);
-    IntAutomaton a = a1.or(a2);
+    Automaton a1 = new Automaton(1);
+    Automaton a2 = new Automaton(2);
+    Automaton a = a1.or(a2);
     assert !a.isAccepting();
 
     a.consume(1);
@@ -49,7 +50,7 @@ final class TestAutomaton {
 
   @Test
   void testRepeat() {
-    IntAutomaton a = new IntAutomaton(1).repeated();
+    Automaton a = new Automaton(1).repeated();
     assert a.isAccepting();
 
     a.consume(1);
@@ -61,10 +62,10 @@ final class TestAutomaton {
 
   @Test
   void testDeterminize1() {
-    IntAutomaton a1 = new IntAutomaton(1);
-    IntAutomaton a2 = new IntAutomaton(2);
-    IntAutomaton a3 = new IntAutomaton(3);
-    IntAutomaton a = a1.and(a2.or(a3)).and(a1).minDeterminized();
+    Automaton a1 = new Automaton(1);
+    Automaton a2 = new Automaton(2);
+    Automaton a3 = new Automaton(3);
+    Automaton a = a1.and(a2.or(a3)).and(a1).minDeterminized();
     assert !a.isAccepting();
 
     a.consume(1);
@@ -82,7 +83,7 @@ final class TestAutomaton {
 
   @Test
   void testDeterminized2() {
-    IntAutomaton a = new IntAutomaton().determinized();
+    Automaton a = new Automaton().determinized();
     assert a.getStates().isEmpty();
 
     a.consume(1);
@@ -91,17 +92,17 @@ final class TestAutomaton {
 
   @Test
   void testGetTransitions() {
-    IntAutomaton a = new IntAutomaton(1);
+    Automaton a = new Automaton(1);
     assert a.getTransitionsFrom(a.initials.iterator().next()).size() == 1;
     assert a.getTransitionsTo(a.finals.iterator().next()).size() == 1;
   }
 
   @Test
   void testGetReverseEpsilonClosure() {
-    IntAutomaton a1 = new IntAutomaton(1).and(new IntAutomaton(null));
+    Automaton a1 = new Automaton(1).and(new Automaton(null));
     assert a1.getEpsilonClosureTo(a1.finals).size() == 3;
 
-    IntAutomaton a2 = new IntAutomaton(1).and(new IntAutomaton(null)).repeated();
+    Automaton a2 = new Automaton(1).and(new Automaton(null)).repeated();
     assert a2.getEpsilonClosureTo(a2.finals.iterator().next()).size() == 4;
   }
 }
